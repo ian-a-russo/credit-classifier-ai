@@ -1,0 +1,11 @@
+age,income,credit_history,employment,property
+30,5000.0,positive,yes,yes
+22,2000.0,negative,no,no
+45,9000.0,positive,yes,yes
+35,3000.0,negative,yes,no
+28,4500.0,positive,no,yes
+60,12000.0,positive,yes,yes
+19,1500.0,negative,no,no
+50,7000.0,positive,yes,no
+40,4000.0,negative,yes,yes
+33,5500.0,positive,yes,yes
