@@ -1,0 +1,11 @@
+age,income,credit_history,employment,property,resultado
+30,5000.0,1,1,1,aceito
+22,2000.0,0,0,0,negado
+45,9000.0,1,1,1,aceito
+35,3000.0,0,1,0,negado
+28,4500.0,1,0,1,aceito
+60,12000.0,1,1,1,aceito
+19,1500.0,0,0,0,negado
+50,7000.0,1,1,0,aceito
+40,4000.0,0,1,1,negado
+33,5500.0,1,1,1,aceito

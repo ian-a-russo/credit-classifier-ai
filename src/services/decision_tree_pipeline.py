@@ -1,10 +1,9 @@
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
-
 from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 class DecisionTreePipeline:
     def __init__(self, training_table: pd.DataFrame, testing_table: pd.DataFrame, categorical_columns: list[str]):
@@ -31,7 +30,9 @@ class DecisionTreePipeline:
 
     def train_predict(self):
         prediction = self._model.predict(self._x_test)
-        return accuracy_score(self._y_test, prediction)
+        accuracy = accuracy_score(self._y_test, prediction)
+
+        print("Acurácia:", accuracy)
 
     def test(self):
         x_real_test = self._testing_table[self._x_train.columns]
