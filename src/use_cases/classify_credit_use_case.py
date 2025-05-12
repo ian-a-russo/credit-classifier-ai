@@ -2,9 +2,6 @@ import pandas as pd
 from src.services.decision_tree_pipeline import DecisionTreePipeline
 
 class ClassifyCreditUseCase:
-    def __init__(self):
-        pass
-
     def execute(self):
         training_table = pd.read_csv('src/data/training_data.csv')
         training_table['approved'] = (

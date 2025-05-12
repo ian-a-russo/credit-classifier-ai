@@ -6,13 +6,18 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 class DecisionTreePipeline:
-    def __init__(self, training_table: pd.DataFrame, testing_table: pd.DataFrame, categorical_columns: list[str]):
+    def __init__(
+            self, 
+            training_table: pd.DataFrame, 
+            testing_table: pd.DataFrame, 
+            categorical_columns: list[str]
+        ):
         self._model = RandomForestClassifier()
         self._training_table = training_table.copy()
         self._testing_table = testing_table.copy()
         self._categorical_columns = categorical_columns
         self._encoders = {}
-        self._target_encoder = LabelEncoder()  # novo
+        self._target_encoder = LabelEncoder()
 
     def encode_categoricals(self):
         for column in self._categorical_columns:
