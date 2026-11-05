@@ -1,39 +1,46 @@
+import logging
+
 import pandas as pd
-from src.services.decision_tree_pipeline import DecisionTreePipeline
+from sklearn.model_selection import train_test_split
+
+from src import config
+from src.domain.approval_rule import ApprovalRule
+from src.repositories.csv_credit_repository import CsvCreditRepository
+from src.services.credit_model import CreditModel
+
+logger = logging.getLogger(__name__)
+
 
 class ClassifyCreditUseCase:
-    def execute(self):
-        training_table = pd.read_csv('src/data/training_data.csv')
-        training_table['approved'] = (
-            (training_table['income'] > 3000) &
-            (training_table['credit_history'] == 'positive')
-        ).astype(int)
+    def __init__(
+        self,
+        repository: CsvCreditRepository,
+        model: CreditModel,
+        rule: ApprovalRule,
+    ) -> None:
+        self._repository = repository
+        self._model = model
+        self._rule = rule
 
-        testing_table = pd.read_csv('src/data/testing_data.csv')
+    def execute(self) -> pd.DataFrame:
+        self._train()
+        results = self._classify(self._repository.load_testing())
+        self._repository.save_results(results)
+        return results
 
-        categorical_columns = ['credit_history', 'employment', 'property']
+    def _train(self) -> None:
+        history = self._repository.load_training()
+        decisions = self._rule.label(history)
+        x_train, x_valid, y_train, y_valid = train_test_split(
+            history,
+            decisions,
+            test_size=config.VALIDATION_SIZE,
+            random_state=config.RANDOM_STATE,
+            stratify=decisions,
+        )
+        self._model.fit(x_train, y_train)
+        logger.info("Acurácia na validação: %.4f", self._model.evaluate(x_valid, y_valid))
 
-        self._pipeline = DecisionTreePipeline(training_table, testing_table, categorical_columns)
-        self._pipeline.encode_categoricals()
-
-        x = self._pipeline._training_table.drop(columns=["approved", "age"])
-        y = self._pipeline._training_table["approved"]
-
-        self._pipeline.train_model(x, y)
-        self._pipeline.train_predict()
-
-        decision_tree_test_forecast = self._pipeline.test()
-
-        self.format_and_save_result(decision_tree_test_forecast)
-
-        
-    def format_and_save_result(self, dataframe: pd.DataFrame):
-        formatted_result = pd.Series(dataframe).map({1: "aceito", 0: "negado"})
-
-        result_table = self._pipeline._testing_table.copy()
-        result_table = result_table.reset_index(drop=True)
-        result_table["resultado"] = formatted_result
-
-        print(result_table)
-
-        result_table.to_csv("src/data/results/predictions_credit_result.csv", index=False)
+    def _classify(self, applicants: pd.DataFrame) -> pd.DataFrame:
+        decisions = pd.Series(self._model.predict(applicants), index=applicants.index)
+        return applicants.assign(resultado=self._rule.describe(decisions))
